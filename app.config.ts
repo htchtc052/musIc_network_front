@@ -1,7 +1,7 @@
 export default defineAppConfig({
     ui: {
         strategy: "override",
-        primary: "blue",
+        primary: "green",
         gray: "cool",
         avatar: {
             size: {
@@ -15,11 +15,11 @@ export default defineAppConfig({
         container: {
             constrained: 'max-w-screen-lg'
         },
-        icons: []
-
+        icons: {
+            dynamic: true
+        }
 
 
     },
-    container: {
-    },
+    container: {},
 });

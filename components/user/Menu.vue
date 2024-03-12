@@ -3,8 +3,6 @@ import type { User } from "~/types/types";
 
 const props = defineProps<{ userProfile: User }>();
 
-console.debug("rrr", props.userProfile);
-
 const links = [
   {
     label: "Info",

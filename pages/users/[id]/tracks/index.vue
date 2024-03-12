@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Track } from "~/types/types";
+import {type Track} from "~/types/types";
 
 const userProfile = await useGetUserProfile();
 
@@ -11,49 +11,96 @@ const api = useClientApi();
 
 const {
   data: tracksData,
-  error: tracksError,
+  error,
   pending,
-} = await useAsyncData<{
-  tracks: Track[];
-}>("user.tracks", async () => {
-  const tracks = await api.userProfile.getUserTracks(id);
-  return { tracks };
+} = await useLazyAsyncData<Track[]>("user.tracks", () => api.userProfile.getUserTracks(id));
+
+
+const tracks: ComputedRef<Track[] | undefined> = computed(() => {
+  return tracksData.value?.map(track => {
+        let n = 0;
+        return {
+          ...track,
+          position: n++,
+          class: 'border-b border-gray-300 hover:bg-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+        }
+      }
+  );
 });
 
-const tracks = ref<Track[]>([] as Track[]);
-
-if (tracksData.value) {
-  tracks.value = tracksData.value?.tracks;
-}
-
 const columns = [
-  {
-    key: "id",
-    label: "#",
-    sortable: true,
-  },
-  {
-    key: "title",
-    label: "Title",
-    sortable: true,
-  },
-  {
-    key: "completed",
-    label: "Status",
-    sortable: true,
-  },
-  {
-    key: "actions",
-    label: "Actions",
-    sortable: false,
-  },
-];
+  {key: 'position'},
+  {key: 'play'},
+  {key: 'title', label: 'Title'},
+  {key: 'duration', label: 'Duration'}, {key: 'actions'}
+]
+const trackActions = (row: any) => [
+  [{
+    label: 'Edit',
+    icon: 'i-heroicons-pencil-square-20-solid',
+    click: () => console.log('Edit', row.id)
+  }, {
+    label: 'Delete',
+    icon: 'i-heroicons-trash-20-solid'
+  }]
+]
+
+
 </script>
 <template>
   <UContainer class="py-4">
-    <UserMenu :userProfile="userProfile" />
+    <UserMenu :userProfile="userProfile"/>
   </UContainer>
   <UContainer>
+    <UCard>
+      <template #header>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+          User tracks
+        </h3>
+      </template>
+      <UTable :columns="columns" :rows="tracks" :loading="pending"
+              :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No tracks.' }"
+      >
+
+        <template #position-data="{index}">
+          {{ index+1 }}
+        </template>
+
+        <template #play-data="{row}">
+          <UButton variant="solid" size="xs" class="bg-primary-600">
+            <UIcon name="i-heroicons-play-solid" />
+          </UButton>
+        </template>
+        <template #title-data="{ row }">
+          {{ row.title }}
+        </template>
+
+        <template #duration-header="{ column, sort }">
+          <UIcon name="i-heroicons-clock"/>
+        </template>
+
+        <template #duration-data="{ row }">
+          05:35
+        </template>
+
+        <template #actions-data="{ row }">
+          <div class="flex justify-end gap-x-1.5">
+            <UButton variant="solid" size="xs">
+              <UIcon name="i-heroicons-pencil-square"/>
+              Edit
+            </UButton>
+            <UButton variant="outline" size="xs" color="red">
+              <UIcon name="i-heroicons-trash"/>
+              Delete
+            </UButton>
+          </div>
+          <!--       <UDropdown :items="trackActions(row)">
+                      <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid"/>
+                    </UDropdown>-->
+        </template>
+      </UTable>
+    </UCard>
+
     <!--    <UCard>
       <template #header>
         <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
