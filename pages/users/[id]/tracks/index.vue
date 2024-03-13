@@ -45,6 +45,19 @@ const trackActions = (row: any) => [
   }]
 ]
 
+const {reveal, isRevealed, cancel, confirm } = useConfirmDialog();
+const deleteTrack = async (row: Track) => {
+
+  const {isCanceled} = await reveal();
+  if (isCanceled) {
+    return;
+  }
+
+  console.log(row);
+
+  alert('SSH Key deleted!');
+}
+
 
 </script>
 <template>
@@ -63,12 +76,12 @@ const trackActions = (row: any) => [
       >
 
         <template #position-data="{index}">
-          {{ index+1 }}
+          {{ index + 1 }}
         </template>
 
         <template #play-data="{row}">
           <UButton variant="solid" size="xs" class="bg-primary-600">
-            <UIcon name="i-heroicons-play-solid" />
+            <UIcon name="i-heroicons-play-solid"/>
           </UButton>
         </template>
         <template #title-data="{ row }">
@@ -89,7 +102,7 @@ const trackActions = (row: any) => [
               <UIcon name="i-heroicons-pencil-square"/>
               Edit
             </UButton>
-            <UButton variant="outline" size="xs" color="red">
+            <UButton variant="outline" size="xs" color="red" @click="deleteTrack(row)">
               <UIcon name="i-heroicons-trash"/>
               Delete
             </UButton>
@@ -100,6 +113,18 @@ const trackActions = (row: any) => [
         </template>
       </UTable>
     </UCard>
+    <UModal v-model="isRevealed" @close="cancel">
+      <UNotification
+          title="Are you sure you want to delete track?"
+          description="This will permanently delete track."
+          color="red"
+          :timeout="0"
+          :actions="[
+          { label: 'Cancel', color: 'gray', click: cancel },
+          { label: 'Confirm', color: 'red', click: confirm },
+        ]"
+      />
+    </UModal>
 
     <!--    <UCard>
       <template #header>
