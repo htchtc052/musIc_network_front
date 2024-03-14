@@ -56,7 +56,7 @@ export const useClientApi = () => {
           method: "POST",
           body: editTrackInfoInput,
         }),
-      deleteTrack: (id: number, editTrackInfoInput: EditTrackInfoInput) =>
+      deleteTrack: (id: number) =>
         http<Track>("/tracks/" + id + "/deleteTrack", {
           method: "DELETE",
         }),

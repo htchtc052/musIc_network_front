@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {type Track} from "~/types/types";
+import {useAuthStore} from "#imports";
 
 const userProfile = await useGetUserProfile();
 
@@ -12,6 +13,7 @@ const api = useClientApi();
 const {
   data: tracksData,
   error,
+  refresh,
   pending,
 } = await useLazyAsyncData<Track[]>("user.tracks", () => api.userProfile.getUserTracks(id));
 
@@ -46,6 +48,7 @@ const trackActions = (row: any) => [
 ]
 
 const {reveal, isRevealed, cancel, confirm } = useConfirmDialog();
+
 const deleteTrack = async (row: Track) => {
 
   const {isCanceled} = await reveal();
@@ -53,9 +56,14 @@ const deleteTrack = async (row: Track) => {
     return;
   }
 
-  console.log(row);
-
-  alert('SSH Key deleted!');
+  try {
+    await api.tracks.deleteTrack(row.id)
+    await refresh();
+  } catch (error: any) {
+    if (error.statusCode === 401) {
+      await navigateTo("/login");
+    }
+  }
 }
 
 
@@ -115,6 +123,7 @@ const deleteTrack = async (row: Track) => {
     </UCard>
     <UModal v-model="isRevealed" @close="cancel">
       <UNotification
+          id="track_del"
           title="Are you sure you want to delete track?"
           description="This will permanently delete track."
           color="red"

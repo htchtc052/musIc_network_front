@@ -52,13 +52,7 @@ export const useFetchInstance = () => {
           accessToken.value = null;
           refreshToken.value = null;
         }
-      } /* else if (_ctx.response.status == 500) {
-        console.error(`Api error 500`, _ctx.response._data.message);
-        throw createError({
-          message: "Server error",
-          statusCode: 500,
-        });
-      }*/
+      }
     },
   });
 

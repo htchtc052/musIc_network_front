@@ -57,7 +57,6 @@ export const useAuthStore = defineStore("auth", () => {
   function logout() {
     user.value = undefined;
     setTokensCookies({ accessToken: null, refreshToken: null });
-
     //navigateTo("/login");
   }
 
